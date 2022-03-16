@@ -57,8 +57,8 @@
 					<!-- list -->
 					<div id="list">
 						<ul>
-							<li><a><span id="latest-order">최신순</span></a></li>
-							<li><a><span id="best-order">인기순</span></a></li>
+							<li><a><span>최신순</span></a></li>
+							<li><a><span>인기순</span></a></li>
 						</ul>
 						<span class="glyphicon glyphicon-filter" aria-hidden="true"></span>
 						<div id="category" class="dropdown">
@@ -73,50 +73,10 @@
 							</ul>
 						</div>
 					</div>
-					<c:if test="${result eq 'sameUser'}">
+					<!-- 서평리스트 -->
+					<c:if test="${result eq nickname }">
 						<div id="rvlist"></div>
 					</c:if>
-					
-					<!-- 서평 리스트 -->
-					<!-- 
-               
-	               <c:forEach items="${mbList }" var="vo">
-	                  <div id="reviews">
-	                     <div id="reviews-header">
-	                        <div class="left">
-	                           <p>
-	                              <a href="${pageContext.request.contextPath}/bookdetail?bookNo=${vo.bookNo}">${vo.bookTitle }</a>
-	                           </p>
-	                        </div>                                                
-	                        <div class="right">
-	                           <a>수정</a> <a>삭제</a>
-	                        </div>                      
-	                     </div>
-	                     	
-	                     <div id="reviews-content">
-	                        <p>${vo.reviewContent }</p>
-	                     </div>
-	                     <div id="reviews-footer">
-	                        <div class="left">
-	                           <span id="heart" data-reviewno="${vo.reviewNo }" class="like glyphicon glyphicon-heart-empty" aria-hidden="true"></span> <span>${vo.likecnt }</span> <span>${vo.reviewDate }</span>
-	                        </div>
-	                        <div class="right">
-	                           <div class="dropup">
-	                              <a id="dLabel" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> 더보기 <span class="caret"></span>
-	                              </a>
-	                              <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu2">
-	                                 <li role="presentation"><a id="add_pli" role="menuitem" tabindex="-1">플레이리스트에 추가<span id="plus">+</span></a></li>
-	                                 <li role="presentation" class="divider"></li>
-	                                 <li role="presentation"><a id="shr_review" role="menuitem" tabindex="-1">서평 공유하기<span class="glyphicon glyphicon-share" aria-hidden="true"></span></a></li>
-	                                 <li role="presentation" class="divider"></li>
-	                                 <li role="presentation"><a role="menuitem" tabindex="-1" target="_blank" href="${pageContext.request.contextPath}/imgpreview">이미지 저장하기<span class="glyphicon glyphicon-save" aria-hidden="true"></span>
-	                                 </a></li>
-	                              </ul>
-	                           </div>
-	                        </div>
-	                     </div>
-	                  </div>
-	               </c:forEach> -->
 					<!-- 서평리스트 -->
 				</div>
 				<!-- //col-xs-8 -->
@@ -166,7 +126,6 @@
 	
 	//리스트(로딩되기전에 요청)
 	$(document).ready(function() {
-		
 		console.log("리스트요청");
 		
 		//색깔변화
@@ -175,50 +134,13 @@
     	
 		//리스트그리기
 		fetchList();
-	
 	});
-	
-	
-	/*미리 좋아요 여부 로딩
-	function liked(){
-		
-		$.ajax({
-			//url로 요청할게!    
-			url : "${pageContext.request.contextPath }/likecheck",
-			type : "post",
-			
-			//주소뒤에 갈 데이터 전송방식, //자바 스크립트 객체를 json형식으로 변경
-			dataType : "json", //json> javascript
-			success : function(likecheck) {
-				
-			   	//좋아요가 없는경우
-			   	if (likecheck == 0) {
-				   	
-			      console.log("좋아요")
-			      			     
-			      $this.attr('class', 'glyphicon glyphicon-heart-empty');
-			      
-			   //이미 좋아요가 되어있는 경우
-			   } else {
-			      console.log("좋아요취소")
-			      
-			      $this.attr('class', 'glyphicon glyphicon-heart');
-			   }
 
-			},
-			//로그인하지 않은경우(모달창띄워주기)
-			error : function(XHR, status, error) {
-			   console.error(status + " : " + error);
-			}
-		});
-	}
-	*/
-	
 	//리스트 그리기(최신순)
 	function fetchList() {
 
 		$.ajax({
-			url : "${pageContext.request.contextPath }/${nickname}/list", ///<<<파라미터로 인기순 최신순 나눠보기
+			url : "${pageContext.request.contextPath }/${nickname}/list",
 			type : "post",
 
 			dataType : "json",
@@ -288,39 +210,16 @@
 		$("#rvlist").empty();
 		popularList();
 	});
-	
-	/*
-	//좋아요 카운트가 클릭됐을때
-	$("#rvlist").on("click", ".likecontrol", function() {
-		
-		//데이터수집
-		var $this = $(this);
-		var no = $this.data("reviewno");
-		var likecnt = $this.data("likecnt")	;
 
-		//출력(리뷰넘버찍어보기), json 으로 보내주기
-		console.log("서평넘버 : "+no+"좋아요 수 : "+likecnt);
-	
-	});
-	*/	
-	
 	//좋아요 버튼을 클릭했을때(이벤트)
 	$("#rvlist").on("click", ".like", function() {
 
-		var $this = $(this);
-		console.log($(this).next());
-		
-		$(this).next().html(10000);
-		
-		
 		//데이터수집
 		var $this = $(this);
 		var no = $this.data("reviewno");
-		var likecnt = $this.data("likecnt")	;
 
 		//출력(리뷰넘버찍어보기), json 으로 보내주기
-		console.log("서평넘버 : "+no);
-
+		console.log(no);
 		var clickReviewVo = {
 			reviewNo : no
 		};
@@ -334,34 +233,68 @@
 			data : JSON.stringify(clickReviewVo),
 			//주소뒤에 갈 데이터 전송방식, //자바 스크립트 객체를 json형식으로 변경
 			dataType : "json", //json> javascript
-			
-			success : function(likeok) {
-				
-			   	//좋아요인경우
-			   	if (likeok == 0) {
-				   	
-			      console.log("좋아요")
-			      
-			      //하트모양변경
-			      $this.attr('class', 'like glyphicon glyphicon-heart');
-			      //좋아요카운트변경
-			      
-			   
-			   } else {
-			      console.log("좋아요취소")
-			      
-			      $this.attr('class','like glyphicon glyphicon-heart-empty');
-			   }
+		/*
+		success : function(guestbookVo) {
+		   //성공시 처리해야될 코드 작성//
+		   console.log(guestbookVo);
+		   render(guestbookVo, "up"); //위로 붙일지!
+		   
+		   //좋아요인경우
+		   if (isExist == true) {
+		      console.log("좋아요")
+		      
+		      let like = document.getElementById('heart');
+		      like.classList.replace("glyphicon-heart-empty",
+		            "glyphicon-heart");
+		      
+		      //좋아요한 테이블에 데이터추가
+		   //좋아요취소인경우
+		   } else {
+		      console.log("좋아요취소")
+		      
+		      let like = document.getElementById('heart');
+		      like.classList.replace("glyphicon-heart",
+		            "glyphicon-heart-empty");
+		   }
 
-			},
-			//로그인하지 않은경우(모달창띄워주기)
-			error : function(XHR, status, error) {
-			   console.error(status + " : " + error);
-			}
+		   //입력화면 초기화
+		   $("#input-uname").val("");
+		   $("#input-pass").val("");
+		   $("[name='content']").val("");
+		   
+		   //숫자도 바껴야함
+		},
+		//로그인하지 않은경우(모달창띄워주기)
+		error : function(XHR, status, error) {
+		   console.error(status + " : " + error);
+		}*/
+
 		});
 
 	});
 
+	/*
+	//포함되어있으면 true      
+	   let isExist = document.getElementsByClassName('heart').classList
+	         .contains('glyphicon-heart-empty');
+	   
+	   console.log(isExist);
+	   
+	//좋아요
+	if (isExist == true) {
+	   console.log("좋아요")
+
+	   let like = document.getElementById('heart');
+	   like.classList.replace("glyphicon-heart-empty", "glyphicon-heart");
+	   
+	//좋아요취소인경우
+	} else {
+	   console.log("좋아요취소")
+
+	   let like = document.getElementById('heart');
+	   like.classList.replace("glyphicon-heart", "glyphicon-heart-empty");
+	}
+	 */
 	 
 	function render(mybookVo, updown) {
 		
@@ -381,8 +314,12 @@
 		str += ' 		<span class="label label-default">'+mybookVo.emoName+'</span> ';
 		str += ' 	</div> ';
 		str += ' 	<div id="reviews-footer"> ';
-		str += ' 		<div class="left likecontrol"> ';
-		str += ' 			<span id="heart" data-reviewno="'+mybookVo.reviewNo+'" class="like glyphicon glyphicon-heart-empty" aria-hidden="true"></span> <span class="likecnt" data-likecnt="'+mybookVo.likecnt+'">'+ mybookVo.likecnt+ '</span> <span>'+ mybookVo.reviewDate+ '</span> ';
+		str += ' 		<div class="left"> ';
+		str += ' 			<span id="heart" data-reviewno="'+mybookVo.reviewNo+'" class="like glyphicon glyphicon-heart-empty" aria-hidden="true"></span> <span>'
+				+ mybookVo.likecnt
+				+ '</span> <span>'
+				+ mybookVo.reviewDate
+				+ '</span> ';
 		str += ' 		</div> ';
 		str += ' 		<div class="right"> ';
 		str += ' 			<div class="dropup"> ';
@@ -407,7 +344,6 @@
 			console.log("방향오류");
 		}
 	}
-	
 </script>
 <script src="${pageContext.request.contextPath}/asset/js/more.js"></script>
 </html>

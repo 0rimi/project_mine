@@ -7,8 +7,8 @@ import javax.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -52,17 +52,6 @@ public class MybookController {
          //세션아이디의 유저넘버
          int userNo = ((UserVo)session.getAttribute("authUser")).getUserNo(); 
          
-         
-         //서평리스트출력
-         //유저넘버를 주면 해당 유저가 작성한 리뷰를 불러오는 메소드
-         System.out.println("유저넘버"+userNo+"의 리스트");
-         
-         List<MybookVo> mbList =  mybookService.list(userNo);
-         
-         //모델로 보내기
-         model.addAttribute("mbList", mbList);         
-         
-         
          return "mybook/mybook_review";
          
       }else {
@@ -78,21 +67,19 @@ public class MybookController {
          UserVo otherUser = userService.getUser(nickname);
          int userNo = otherUser.getUserNo();
          
-         //유저넘버를 주면 해당 유저가 작성한 리뷰를 불러오는 메소드
-         System.out.println("유저넘버"+userNo+"의 리스트");
-         
-         List<MybookVo> mbList =  mybookService.list(userNo);
-         
-         //모델로 보내기
-         model.addAttribute("mbList", mbList);
-         
-         
-         return "mybook/mybook_review";
+        
+         return "mybook/otherbook_review";
       }
       
+      
+//      else if(nickname == null){
+//    	  System.out.println("세션만료 로그인필요");
+//    	  
+//    	  return "user/loginForm";
+//      }
    }
    
-   /*
+   
    //리스트 출력 기능
    @ResponseBody  //리스폰스바디에 붙여 보낼게!
    @RequestMapping("/{nickname}/list")
@@ -111,7 +98,7 @@ public class MybookController {
 
          //서평리스트출력
          //유저넘버를 주면 해당 유저가 작성한 리뷰를 불러오는 메소드
-         System.out.println("유저넘버"+userNo+"의 리스트");
+         System.out.println("유저넘버"+userNo+"의 최신 리스트");
          
          List<MybookVo> mbList = mybookService.list(userNo);
       
@@ -124,21 +111,58 @@ public class MybookController {
          int userNo = otherUser.getUserNo();
          
          //유저넘버를 주면 해당 유저가 작성한 리뷰를 불러오는 메소드
-         System.out.println("유저넘버"+userNo+"의 리스트");
+         System.out.println("유저넘버"+userNo+"의 최신 리스트");
          
          List<MybookVo> mbList = mybookService.list(userNo);
          
          return mbList;
-      }
-      
+      } 
    }
-   */
    
-   //좋아요버튼을 눌렀을때의 기능
+   //인기리스트
+   @ResponseBody  //리스폰스바디에 붙여 보낼게!
+   @RequestMapping("/{nickname}/popularlist")
+   public List<MybookVo> popularlist(@PathVariable(value="nickname") String nickname,
+                           HttpSession session, Model model) {
+      System.out.println("mybook.popularlist");
+      
+      //세션의 닉네임
+      String yours = ((UserVo)session.getAttribute("authUser")).getNickname();
+            
+      //세션아이디랑 지금 블로그닉네임이 같니?
+      if(nickname.equals(yours)) {
+         
+         //세션아이디의 유저넘버
+         int userNo = ((UserVo)session.getAttribute("authUser")).getUserNo();
+
+         //서평리스트출력
+         //유저넘버를 주면 해당 유저가 작성한 리뷰를 불러오는 메소드
+         System.out.println("유저넘버"+userNo+"의 인기 리스트");
+         
+         List<MybookVo> popularlist = mybookService.popularlist(userNo);
+      
+         return popularlist;
+         
+      }else {
+                  
+         //지금 서재 닉네임을 주면 유저넘버, 닉네임, 프로필이미지를 주는 메소드 사용
+         UserVo otherUser = userService.getUser(nickname);
+         int userNo = otherUser.getUserNo();
+         
+         //유저넘버를 주면 해당 유저가 작성한 리뷰를 불러오는 메소드
+         System.out.println("유저넘버"+userNo+"의 인기 리스트");
+         
+         List<MybookVo> popularlist = mybookService.popularlist(userNo);
+         
+         return popularlist;
+      } 
+   }
+   
+   //좋아요 체크
    @ResponseBody
-   @RequestMapping("/like")
-   public String like(HttpSession session,
-                  @ModelAttribute MybookVo clickReview) {
+   @RequestMapping("/likecheck")
+   public int likecheck(HttpSession session,
+		   			  @RequestBody MybookVo clickReview) {
       
       //세션아이디의 유저넘버
       int userNo = ((UserVo)session.getAttribute("authUser")).getUserNo();
@@ -147,19 +171,55 @@ public class MybookController {
       
       System.out.println("로그인한 유저 넘버 : " + userNo);
       System.out.println("클릭한 서평 넘버 : " + clickNo);
+      
+      MybookVo checklike = new MybookVo(clickNo, userNo);
 
       //일단 중복이 있는지 부터 확인하자, 해당유저가 이 서평을 좋아요했는지 안했는지 알아보기
-//         int likeok = mybookService.likeok(userNo);
-//      if(//좋아요테이블에 해당서평과 유저넘버가 이미 존재하는경우가 아닐때 ok) {
-//         //세션아이디의 유저넘버 넣어주면 좋아요 반영해주고 좋아요 수도 되돌려주는 메소드
-//         MybookVo likeVo = mybookService.like(userNo);
-//      }else {
-//         //좋아요를 아직 안한경우
+      int likecheck = mybookService.likeok(checklike);
+       
+      return likecheck;
+   }
+   
+   
+   //좋아요버튼을 눌렀을때의 기능
+   @ResponseBody
+   @RequestMapping("/like")
+   public int like(HttpSession session,
+		   			  @RequestBody MybookVo clickReview) {
       
+      //세션아이디의 유저넘버
+      int userNo = ((UserVo)session.getAttribute("authUser")).getUserNo();
+      //클릭한 서평 넘버
+      int clickNo = clickReview.getReviewNo();
       
-      //유저넘버가져오기
+      System.out.println("로그인한 유저 넘버 : " + userNo);
+      System.out.println("클릭한 서평 넘버 : " + clickNo);
       
-      return "";
+      MybookVo checklike = new MybookVo(clickNo, userNo);
+
+      //일단 중복이 있는지 부터 확인하자, 해당유저가 이 서평을 좋아요했는지 안했는지 알아보기
+      int likeok = mybookService.likeok(checklike);
+      
+      //좋아요를 안한경우
+      if(likeok == 0) {
+         
+		 //review_user table에 인서트
+    	 mybookService.like(checklike);
+	     
+	     System.out.println(checklike.getReviewNo()+"번 서평 좋아요");
+	     
+	     return likeok;
+	     
+      //좋아요를 이미 한 경우
+      }else {
+    	  
+         //review_user에서 삭제
+    	 mybookService.dislike(checklike); 
+    	  
+    	 System.out.println(checklike.getReviewNo()+"번 서평 좋아요 취소");
+    	 
+    	 return likeok;
+      }
    }
 
    //취향저격(main페이지)

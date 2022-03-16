@@ -43,9 +43,88 @@
 			where   r.book_no = b.book_no
 			and r.user_no = #{userNo}
 			ORDER BY reviewDate asc
-			]]>
+		]]>
 
 	</select>
+	
+	<!-- selectpopular -->
+	<select id="selectpopular" resultType="MybookVo" parameterType="int">
+		<![CDATA[
+			select  r.review_no reviewNo,
+        			b.book_title bookTitle,
+        			b.book_no bookNo,
+        			r.user_no userNo,
+        			r.nickname,
+        			r.review_content reviewContent,
+        			r.style_no styleNo,
+        			r.emo_name emoName,
+        			r.likecnt,
+        			to_char(r.review_date, 'yyyy/mm/dd') reviewDate
+			from   (select  r.review_no,
+                			ru.likecnt,
+                			r.style_no,
+                			r.emo_name,
+                			r.user_no,
+                			r.book_no,
+                			r.nickname,
+                			r.review_content,
+                			r.review_date
+        			from   (select  r.review_no,
+                        			s.style_no,
+                        			e.emo_no,
+                        			e.emo_name,
+                        			r.book_no,
+                        			u.user_no,
+                        			u.nickname,
+                        			r.review_content,
+                        			r.review_date
+                			from    review r, style s, emotion e, users u
+                			where   e.emo_no = s.emo_no
+                			and     r.style_no = s.style_no
+                			and     r.user_no = u.user_no) r,(select review_no, count(review_no) likecnt
+                                                    		  from review_user
+                                                    		  group by review_no) ru
+        			where r.review_no = ru.review_no) r, books b
+			where   r.book_no = b.book_no
+			and r.user_no = #{userNo}
+			ORDER BY r.likecnt desc
+		]]>
+
+	</select>
+	
+	<!-- checklike -->
+	<select id="checklike" resultType="MybookVo" parameterType="MybookVo">
+		<![CDATA[
+			select  user_no userNo,
+       				review_no reviewNo
+			from review_user
+			where user_no = #{userNo}
+			and review_no = #{reviewNo}
+		]]>
+	</select>
+	
+	<!-- like -->
+	<insert id="like" parameterType="MybookVo">
+		<![CDATA[
+			insert into review_user
+			values(SEQ_REVIEW_USER_NO.nextval, #{userNo}, #{reviewNo}, sysdate)
+		]]>
+	</insert>
+	
+	<!-- dislike -->
+	<delete id="dislike" parameterType="MybookVo">
+		<![CDATA[
+			delete from review_user
+			where user_no = #{userNo}
+			and review_no = #{reviewNo}
+		]]>
+	</delete>
+	
+	
+	
+	
+	
+	
 	
 	
 	<!-- 유저넘버1이 좋아요한 서평

@@ -10,12 +10,17 @@ public class MybookVo {
 	private String reviewContent;
 	private String emoName;
 	private int emoNo;
-	private String reviewDate;
+	private String reviewDate; //서평을 쓴 날짜
 	private int styleNo;
 	private int likecnt;
 	
 	
 	public MybookVo() {}
+	public MybookVo(int reviewNo, int userNo) {
+		super();
+		this.reviewNo = reviewNo;
+		this.userNo = userNo;
+	}
 	public MybookVo(int reviewNo, String bookTitle, String nickname, int userNo, String reviewContent, String emoName,
 			int emoNo, String reviewDate, int styleNo, int likecnt) {
 		super();
