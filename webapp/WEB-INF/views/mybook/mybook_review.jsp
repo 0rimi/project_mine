@@ -178,90 +178,6 @@
 	
 	});
 	
-	
-	/*미리 좋아요 여부 로딩
-	function liked(){
-		
-		$.ajax({
-			//url로 요청할게!    
-			url : "${pageContext.request.contextPath }/likecheck",
-			type : "post",
-			
-			//주소뒤에 갈 데이터 전송방식, //자바 스크립트 객체를 json형식으로 변경
-			dataType : "json", //json> javascript
-			success : function(likecheck) {
-				
-			   	//좋아요가 없는경우
-			   	if (likecheck == 0) {
-				   	
-			      console.log("좋아요")
-			      			     
-			      $this.attr('class', 'glyphicon glyphicon-heart-empty');
-			      
-			   //이미 좋아요가 되어있는 경우
-			   } else {
-			      console.log("좋아요취소")
-			      
-			      $this.attr('class', 'glyphicon glyphicon-heart');
-			   }
-
-			},
-			//로그인하지 않은경우(모달창띄워주기)
-			error : function(XHR, status, error) {
-			   console.error(status + " : " + error);
-			}
-		});
-	}
-	*/
-	
-	//리스트 그리기(최신순)
-	function fetchList() {
-
-		$.ajax({
-			url : "${pageContext.request.contextPath }/${nickname}/list", ///<<<파라미터로 인기순 최신순 나눠보기
-			type : "post",
-
-			dataType : "json",
-			success : function(mbList) {
-				/*성공시 처리해야될 코드 작성*/
-				console.log(mbList);
-
-				//객체 리스트 돌리기(화면 출력)
-				for (var i = 0; i < mbList.length; i++) {
-					//그리기
-					render(mbList[i], "down");
-				}
-			},
-			error : function(XHR, status, error) {
-				console.error(status + " : " + error);
-			}
-		});
-	};
-	
-	//리스트 그리기(인기순)
-	function popularList() {
-
-		$.ajax({
-			url : "${pageContext.request.contextPath }/${nickname}/popularlist",
-			type : "post",
-
-			dataType : "json",
-			success : function(popularlist) {
-				/*성공시 처리해야될 코드 작성*/
-				console.log(popularlist);
-
-				//객체 리스트 돌리기(화면 출력)
-				for (var i = 0; i < popularlist.length; i++) {
-					//그리기
-					render(popularlist[i], "down");
-				}
-			},
-			error : function(XHR, status, error) {
-				console.error(status + " : " + error);
-			}
-		});
-	};
-	
 	// 최신순 인기순 버튼 클릭
 	// 최신순
 	$('#latest-order').on('click', function() {
@@ -289,42 +205,95 @@
 		popularList();
 	});
 	
-	/*
-	//좋아요 카운트가 클릭됐을때
-	$("#rvlist").on("click", ".likecontrol", function() {
-		
-		//데이터수집
-		var $this = $(this);
-		var no = $this.data("reviewno");
-		var likecnt = $this.data("likecnt")	;
-
-		//출력(리뷰넘버찍어보기), json 으로 보내주기
-		console.log("서평넘버 : "+no+"좋아요 수 : "+likecnt);
 	
-	});
-	*/	
+	//리스트 그리기(최신순)
+	function fetchList() {
+
+		$.ajax({
+			url : "${pageContext.request.contextPath }/${nickname}/list?sort=latest", ///<<<파라미터로 인기순 최신순 나눠보기
+			type : "get",
+
+			dataType : "json",
+			success : function(mbList) {
+				/*성공시 처리해야될 코드 작성*/
+				console.log(mbList);
+
+				//객체 리스트 돌리기(화면 출력)
+				for (var i = 0; i < mbList.length; i++) {
+					//그리기
+					render(mbList[i], "down");
+					
+					//중복체크 후 
+				}
+			},
+			error : function(XHR, status, error) {
+				console.error(status + " : " + error);
+			}
+		});
+	};
+	
+	
+	//리스트 그리기(인기순)
+	function popularList() {
+
+		$.ajax({
+			url : "${pageContext.request.contextPath }/${nickname}/list?sort=popular",
+			type : "get",
+
+			dataType : "json",
+			success : function(popularlist) {
+				/*성공시 처리해야될 코드 작성*/
+				console.log(popularlist);
+
+				//객체 리스트 돌리기(화면 출력)
+				for (var i = 0; i < popularlist.length; i++) {
+					//그리기
+					render(popularlist[i], "down");
+				}
+			},
+			error : function(XHR, status, error) {
+				console.error(status + " : " + error);
+			}
+		});
+	};
+
+	//특정 서평 그리기
+	function print(no) {
+
+		$.ajax({
+			url : "${pageContext.request.contextPath }/${nickname}/list?sort=latest", ///<<<파라미터로 인기순 최신순 나눠보기
+			type : "get",
+
+			dataType : "json",
+			success : function(mbList) {
+
+				//객체 리스트 돌리기(화면 출력)
+				render(mbList[no], "down");
+			
+			},
+			error : function(XHR, status, error) {
+				console.error(status + " : " + error);
+			}
+		});
+	};
 	
 	//좋아요 버튼을 클릭했을때(이벤트)
 	$("#rvlist").on("click", ".like", function() {
-
-		var $this = $(this);
-		console.log($(this).next());
-		
-		$(this).next().html(10000);
-		
 		
 		//데이터수집
 		var $this = $(this);
+		
 		var no = $this.data("reviewno");
-		var likecnt = $this.data("likecnt")	;
-
+		//var likecnt = parseInt($(this).next().data("likecnt"));
+		var likecnt = $this.next().data("likecnt");
+		
 		//출력(리뷰넘버찍어보기), json 으로 보내주기
-		console.log("서평넘버 : "+no);
-
+		console.log("서평넘버 : "+no+", 좋아요 수 : "+likecnt);
+		
 		var clickReviewVo = {
 			reviewNo : no
 		};
-
+		
 		//요청 : json 방식
 		$.ajax({
 			//url로 요청할게!    
@@ -337,21 +306,81 @@
 			
 			success : function(likeok) {
 				
-			   	//좋아요인경우
-			   	if (likeok == 0) {
-				   	
-			      console.log("좋아요")
-			      
-			      //하트모양변경
-			      $this.attr('class', 'like glyphicon glyphicon-heart');
-			      //좋아요카운트변경
-			      
-			   
+				//포함되어있으면 true      
+			    let isExist = document.getElementById('latest-order').classList.contains('txt-b');  
+			    console.log(isExist);				
+			    console.log(no);
+			    
+			   /* 
+			  //좋아요인경우
+			   	if (likeok == 0) {	
+			   		
+				    console.log("좋아요");
+					
+				  	//하트모양변경
+			      	$this.attr('class', 'like glyphicon glyphicon-heart');
+				  	
+				    //카운트 +1
+				    $this.next().html(likecnt+1);	
+				    
+				  
+				  	
 			   } else {
-			      console.log("좋아요취소")
+				   
+			       console.log("좋아요취소");
 			      
-			      $this.attr('class','like glyphicon glyphicon-heart-empty');
+			       $this.attr('class','like glyphicon glyphicon-heart-empty');
+			       
+			       $this.next().html(likecnt);
 			   }
+			   */
+			    
+			    
+			   	//좋아요인경우
+			   	if (likeok == 0) {	
+			   		
+				    console.log("좋아요");
+								  
+				  	if(isExist == true){
+				  		
+				  		//$("r"+no).remove();
+				  		//print(no);
+				  		
+				  		
+				  		//초기화 후 그리기
+						$("#rvlist").empty();
+						fetchList();
+				  		
+				  	}else{
+				  		//초기화 후 그리기
+						$("#rvlist").empty();
+						popularList();
+				  	}
+				  	
+				  	//하트모양변경
+			      	$this.attr('class', 'like glyphicon glyphicon-heart');
+				  	
+				    //카운트 +1
+				    //$this.next().html(likecnt+1);				  
+					
+			   } else {
+				   
+			       console.log("좋아요취소");
+			      
+			       if(isExist == true){
+				  		//초기화 후 그리기
+						$("#rvlist").empty();
+						fetchList();	
+				  	}else{
+				  		//초기화 후 그리기
+						$("#rvlist").empty();
+						popularList();
+				  	}
+			       
+			       $this.attr('class','like glyphicon glyphicon-heart-empty');
+			   }
+			     
+			    
 
 			},
 			//로그인하지 않은경우(모달창띄워주기)
@@ -366,23 +395,26 @@
 	function render(mybookVo, updown) {
 		
 		var str = '';
-		str += '	<div id="reviews"> ';
-		str += '		<div id="reviews-header"> ';
+		str += '	<div class="reviews" id=r'+mybookVo.reviewNo+'> ';
+		str += '		<div class="reviews-header"> ';
 		str += ' 		<div class="left"> ';
-		str += ' 			<p><a href="${pageContext.request.contextPath}/bookdetail?bookNo='
-				+ mybookVo.bookNo + '">' + mybookVo.bookTitle + '</a></p> ';
+		str += ' 			<p><a href="${pageContext.request.contextPath}/bookdetail?bookNo='+ mybookVo.bookNo + '">' + mybookVo.bookTitle + '</a></p> ';
 		str += ' 		</div> ';
 		str += ' 		<div class="right"> ';
 		str += ' 			<a>수정</a> <a>삭제</a> ';
 		str += ' 		</div> ';
 		str += ' 	</div> ';
-		str += ' 	<div id="reviews-content"> ';
+		str += ' 	<div class="reviews-content"> ';
 		str += ' 		<p>' + mybookVo.reviewContent + '</p> ';
 		str += ' 		<span class="label label-default">'+mybookVo.emoName+'</span> ';
 		str += ' 	</div> ';
-		str += ' 	<div id="reviews-footer"> ';
+		str += ' 	<div class="reviews-footer"> ';
 		str += ' 		<div class="left likecontrol"> ';
-		str += ' 			<span id="heart" data-reviewno="'+mybookVo.reviewNo+'" class="like glyphicon glyphicon-heart-empty" aria-hidden="true"></span> <span class="likecnt" data-likecnt="'+mybookVo.likecnt+'">'+ mybookVo.likecnt+ '</span> <span>'+ mybookVo.reviewDate+ '</span> ';
+		if(mybookVo.likecheck == 0){
+	         str += ' <span id="heart" data-reviewno="'+mybookVo.reviewNo+'" class="like glyphicon glyphicon-heart-empty" aria-hidden="true"></span> <span class="likecnt" data-likecnt="'+mybookVo.likecnt+'">'+ mybookVo.likecnt+ '</span> <span>'+ mybookVo.reviewDate+ '</span> ';
+	    }else{
+	         str += ' <span id="heart" data-reviewno="'+mybookVo.reviewNo+'" class="like glyphicon glyphicon-heart" aria-hidden="true"></span> <span class="likecnt" data-likecnt="'+mybookVo.likecnt+'">'+ mybookVo.likecnt+ '</span> <span>'+ mybookVo.reviewDate+ '</span> ';
+	    }		
 		str += ' 		</div> ';
 		str += ' 		<div class="right"> ';
 		str += ' 			<div class="dropup"> ';

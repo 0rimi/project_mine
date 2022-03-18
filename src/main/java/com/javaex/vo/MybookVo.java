@@ -13,6 +13,7 @@ public class MybookVo {
 	private String reviewDate; //서평을 쓴 날짜
 	private int styleNo;
 	private int likecnt;
+	private int likecheck;
 	
 	
 	public MybookVo() {}
@@ -20,6 +21,22 @@ public class MybookVo {
 		super();
 		this.reviewNo = reviewNo;
 		this.userNo = userNo;
+	}
+	public MybookVo(int reviewNo, String bookTitle, String bookNo, String nickname, int userNo, String reviewContent,
+			String emoName, int emoNo, String reviewDate, int styleNo, int likecnt, int likecheck) {
+		super();
+		this.reviewNo = reviewNo;
+		this.bookTitle = bookTitle;
+		this.bookNo = bookNo;
+		this.nickname = nickname;
+		this.userNo = userNo;
+		this.reviewContent = reviewContent;
+		this.emoName = emoName;
+		this.emoNo = emoNo;
+		this.reviewDate = reviewDate;
+		this.styleNo = styleNo;
+		this.likecnt = likecnt;
+		this.likecheck = likecheck;
 	}
 	public MybookVo(int reviewNo, String bookTitle, String nickname, int userNo, String reviewContent, String emoName,
 			int emoNo, String reviewDate, int styleNo, int likecnt) {
@@ -122,6 +139,13 @@ public class MybookVo {
 	public void setBookNo(String bookNo) {
 		this.bookNo = bookNo;
 	}
+	public int getLikecheck() {
+		return likecheck;
+	}
+	public void setLikecheck(int likecheck) {
+		this.likecheck = likecheck;
+	}
+	
 	
 	
 	
@@ -131,7 +155,7 @@ public class MybookVo {
 		return "MybookVo [reviewNo=" + reviewNo + ", bookTitle=" + bookTitle + ", bookNo=" + bookNo + ", nickname="
 				+ nickname + ", userNo=" + userNo + ", reviewContent=" + reviewContent + ", emoName=" + emoName
 				+ ", emoNo=" + emoNo + ", reviewDate=" + reviewDate + ", styleNo=" + styleNo + ", likecnt=" + likecnt
-				+ "]";
+				+ ", likecheck=" + likecheck + "]";
 	}
 	
 }
